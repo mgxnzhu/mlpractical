@@ -23,12 +23,9 @@ class SumOfSquaredDiffsError(object):
             targets: Array of target outputs of shape (batch_size, output_dim).
 
         Returns:
-            Scalar error function value.
+            Scalar cost function value.
         """
-        N = outputs.shape[0]
-        error = np.sum((outputs-targets)**2)/(2*N)
-        return error
-        #raise NotImplementedError()
+        return 0.5 * np.mean(np.sum((outputs - targets)**2, axis=1))
 
     def grad(self, outputs, targets):
         """Calculates gradient of error function with respect to outputs.
@@ -38,13 +35,156 @@ class SumOfSquaredDiffsError(object):
             targets: Array of target outputs of shape (batch_size, output_dim).
 
         Returns:
-            Gradient of error function with respect to outputs. This should be
-            an array of shape (batch_size, output_dim).
+            Gradient of error function with respect to outputs.
         """
+        return (outputs - targets) / outputs.shape[0]
+
+    def __repr__(self):
+        return 'MeanSquaredErrorCost'
+
+
+class BinaryCrossEntropyError(object):
+    """Binary cross entropy error."""
+
+    def __call__(self, outputs, targets):
+        """Calculates error function given a batch of outputs and targets.
+
+        Args:
+            outputs: Array of model outputs of shape (batch_size, output_dim).
+            targets: Array of target outputs of shape (batch_size, output_dim).
+
+        Returns:
+            Scalar error function value.
+        """
+        return -np.mean(
+            targets * np.log(outputs) + (1. - targets) * np.log(1. - ouputs))
+
+    def grad(self, outputs, targets):
+        """Calculates gradient of error function with respect to outputs.
+
+        Args:
+            outputs: Array of model outputs of shape (batch_size, output_dim).
+            targets: Array of target outputs of shape (batch_size, output_dim).
+
+        Returns:
+            Gradient of error function with respect to outputs.
+        """
+        return ((1. - targets) / (1. - outputs) -
+                (targets / outputs)) / outputs.shape[0]
+
+    def __repr__(self):
+        return 'BinaryCrossEntropyError'
+
+
+class BinaryCrossEntropySigmoidError(object):
+    """Binary cross entropy error with logistic sigmoid applied to outputs."""
+
+    def __call__(self, outputs, targets):
+        """Calculates error function given a batch of outputs and targets.
+
+        Args:
+            outputs: Array of model outputs of shape (batch_size, output_dim).
+            targets: Array of target outputs of shape (batch_size, output_dim).
+
+        Returns:
+            Scalar error function value.
+        """
+        probs = 1. / (1. + np.exp(-outputs))
+        return -np.mean(
+            targets * np.log(probs) + (1. - targets) * np.log(1. - probs))
+
+    def grad(self, outputs, targets):
+        """Calculates gradient of error function with respect to outputs.
+
+        Args:
+            outputs: Array of model outputs of shape (batch_size, output_dim).
+            targets: Array of target outputs of shape (batch_size, output_dim).
+
+        Returns:
+            Gradient of error function with respect to outputs.
+        """
+        probs = 1. / (1. + np.exp(-outputs))
+        return (probs - targets) / outputs.shape[0]
+
+    def __repr__(self):
+        return 'BinaryCrossEntropySigmoidError'
+
+
+class CrossEntropyError(object):
+    """Multi-class cross entropy error."""
+
+    def __call__(self, outputs, targets):
+        """Calculates error function given a batch of outputs and targets.
+
+        Args:
+            outputs: Array of model outputs of shape (batch_size, output_dim).
+            targets: Array of target outputs of shape (batch_size, output_dim).
+
+        Returns:
+            Scalar error function value.
+        """
+        return -np.mean(np.sum(targets * np.log(outputs), axis=1))
+
+    def grad(self, outputs, targets):
+        """Calculates gradient of error function with respect to outputs.
+
+        Args:
+            outputs: Array of model outputs of shape (batch_size, output_dim).
+            targets: Array of target outputs of shape (batch_size, output_dim).
+
+        Returns:
+            Gradient of error function with respect to outputs.
+        """
+        return -(targets / outputs) / outputs.shape[0]
+
+    def __repr__(self):
+        return 'CrossEntropyError'
+
+
+class CrossEntropySoftmaxError(object):
+    """Multi-class cross entropy error with Softmax applied to outputs."""
+
+    def __call__(self, outputs, targets):
+        """Calculates error function given a batch of outputs and targets.
+
+        Args:
+            outputs: Array of model outputs of shape (batch_size, output_dim).
+            targets: Array of target outputs of shape (batch_size, output_dim).
+
+        Returns:
+            Scalar error function value.
+        """
+<<<<<<< HEAD
+        N = outputs.shape[0]
+        error = np.sum((outputs-targets)**2)/(2*N)
+        return error
+        #raise NotImplementedError()
+=======
+        probs = np.exp(outputs)
+        probs /= probs.sum(-1)[:, None]
+        return -np.mean(np.sum(targets * np.log(probs), axis=1))
+>>>>>>> upstream/mlp2017-8/master
+
+    def grad(self, outputs, targets):
+        """Calculates gradient of error function with respect to outputs.
+
+        Args:
+            outputs: Array of model outputs of shape (batch_size, output_dim).
+            targets: Array of target outputs of shape (batch_size, output_dim).
+
+        Returns:
+            Gradient of error function with respect to outputs.
+        """
+<<<<<<< HEAD
         N = outputs.shape[0]
         error_grad = (outputs-targets)/N
         return error_grad
         #raise NotImplementedError()
+=======
+        probs = np.exp(outputs)
+        probs /= probs.sum(-1)[:, None]
+        return (probs - targets) / outputs.shape[0]
+>>>>>>> upstream/mlp2017-8/master
 
     def __repr__(self):
-        return 'SumOfSquaredDiffsError'
+        return 'CrossEntropySoftmaxError'
