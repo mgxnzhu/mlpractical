@@ -115,16 +115,10 @@ class DataProvider(object):
 
     def shuffle(self):
         """Randomly shuffles order of data."""
-<<<<<<< HEAD
-        new_order = self.rng.permutation(self.inputs.shape[0])
-        self.inputs = self.inputs[new_order]
-        self.targets = self.targets[new_order]
-=======
         perm = self.rng.permutation(self.inputs.shape[0])
         self._current_order = self._current_order[perm]
         self.inputs = self.inputs[perm]
         self.targets = self.targets[perm]
->>>>>>> upstream/mlp2017-8/master
 
     def next(self):
         """Returns next data batch or raises `StopIteration` if at end."""
