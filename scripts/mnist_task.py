@@ -37,7 +37,7 @@ def train_model_and_plot_stats(
     stats, keys, run_time = optimiser.train(num_epochs=num_epochs, stats_interval=stats_interval)
 
     np.save(layer_type+'_'+str(layer_num)+'_'+init_type+'_'+init_mode+'_train_stat.npy',stats)
-'''
+
     # Plot the change in the validation and training set error over training.
     fig_1 = plt.figure(figsize=(8, 4))
     ax_1 = fig_1.add_subplot(111)
@@ -57,7 +57,7 @@ def train_model_and_plot_stats(
     ax_2.legend(loc=0)
     ax_2.set_xlabel('Epoch number')
     #fig_2.savefig(layer_type+'_'+str(layer_num)+'_accuracy.png')
-'''    
+    
     return stats, keys, run_time, fig_1, ax_1, fig_2, ax_2
 
 
