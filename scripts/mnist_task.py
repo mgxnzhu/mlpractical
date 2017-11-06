@@ -2,8 +2,16 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
-import numpy as np
 import argparse
+import numpy as np
+import logging
+from mlp.data_providers import MNISTDataProvider
+from mlp.layers import AffineLayer, SoftmaxLayer, SigmoidLayer, ReluLayer, LeakyReluLayer, ELULayer, SELULayer
+from mlp.errors import CrossEntropySoftmaxError
+from mlp.models import MultipleLayerModel
+from mlp.initialisers import ConstantInit, GlorotUniformInit, GlorotNormalInit, SELUInit
+from mlp.learning_rules import GradientDescentLearningRule
+from mlp.optimisers import Optimiser
 
 parser = argparse.ArgumentParser(description='Welcome to GAN-Shot-Learning script')
 parser.add_argument('--layer_type', nargs="?", type=str, default='Relu',
@@ -36,8 +44,10 @@ def train_model_and_plot_stats(
     # printing statistics every epoch.
     stats, keys, run_time = optimiser.train(num_epochs=num_epochs, stats_interval=stats_interval)
 
-    np.save(layer_type+'_'+str(layer_num)+'_'+init_type+'_'+init_mode+'_train_stat.npy',stats)
-
+    #np.save(layer_type+'_'+str(layer_num)+'_'+init_type+'_'+init_mode+'_train_stat.npy',stats)
+    np.save('SELUInit.npy',stats)
+    return stats, keys, run_time
+'''
     # Plot the change in the validation and training set error over training.
     fig_1 = plt.figure(figsize=(8, 4))
     ax_1 = fig_1.add_subplot(111)
@@ -57,8 +67,9 @@ def train_model_and_plot_stats(
     ax_2.legend(loc=0)
     ax_2.set_xlabel('Epoch number')
     #fig_2.savefig(layer_type+'_'+str(layer_num)+'_accuracy.png')
-    
-    return stats, keys, run_time, fig_1, ax_1, fig_2, ax_2
+''' 
+   
+#    return stats, keys, run_time, fig_1, ax_1, fig_2, ax_2
 
 
 # The below code will set up the data providers, random number
@@ -67,9 +78,6 @@ def train_model_and_plot_stats(
 # will probably not want to reload the data providers on
 # every training run. If you wish to reset their state you
 # should instead use the .reset() method of the data providers.
-import numpy as np
-import logging
-from mlp.data_providers import MNISTDataProvider
 
 # Seed a random number generator
 seed = 10102016 
@@ -88,20 +96,20 @@ valid_data = MNISTDataProvider('valid', batch_size=batch_size, rng=rng)
 # You will probably want to add further code cells for the
 # different experiments you run.
 
-from mlp.layers import AffineLayer, SoftmaxLayer, SigmoidLayer, ReluLayer, LeakyReluLayer, ELULayer, SELULayer
-from mlp.errors import CrossEntropySoftmaxError
-from mlp.models import MultipleLayerModel
-from mlp.initialisers import ConstantInit, GlorotUniformInit, GlorotNormalInit, SELUInit
-from mlp.learning_rules import GradientDescentLearningRule
-from mlp.optimisers import Optimiser
-
 #setup hyperparameters
 learning_rate = 0.01
 num_epochs = 100
 stats_interval = 1
 input_dim, output_dim, hidden_dim = 784, 10, 100
 
-weights_init = eval('Glorot'+init_type+'Init(mode="%s",rng=rng)'%init_mode)
+#weights_init = eval('Glorot'+init_type+'Init(mode="%s",rng=rng)'%init_mode)
+
+# ---- Special Set for SELUInit ----
+layer_num = 4
+layer_type = 'SELU'
+weights_init = SELUInit(rng=rng)
+# ----
+
 biases_init = ConstantInit(0.)
 
 input_layer = AffineLayer(input_dim, hidden_dim, weights_init, biases_init)

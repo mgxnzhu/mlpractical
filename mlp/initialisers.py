@@ -66,8 +66,18 @@ class NormalInit(object):
 
 class SELUInit(object):
     """SELU Initializer."""
-    # write code that implements SELU initialization. Take inspiration from the other initializers in this file.
-    pass
+    
+    def __init__(self, gain=1., rng=None):
+        self.gain = gain
+        if rng is None:
+            rng = np.random.RandomState(DEFAULT_SEED)
+        self.rng = rng
+        
+    def __call__(self, shape):
+        assert len(shape) == 2, (
+            'Initialiser should only be used for two dimensional arrays.')
+        std = 1. / (shape[0])**0.5
+        return self.rng.normal(loc=0., scale=std, size=shape)
 
 
 class GlorotUniformInit(object):
