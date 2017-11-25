@@ -160,3 +160,73 @@ class MomentumLearningRule(GradientDescentLearningRule):
             mom *= self.mom_coeff
             mom -= self.learning_rate * grad
             param += mom
+
+class RMSPropLearningRule(GradientDescentLearningRule):
+    
+    def __init__(self, learning_rate=1e-3, decay_rate=0.9, eps=1e-8):
+        super(RMSPropLearningRule, self).__init__(learning_rate)
+        assert decay_rate >= 0. and decay_rate <= 1., (
+            'decay_rate should be in the range [0, 1].'
+        )
+        assert eps >= 0. and eps <= 1., (
+            'eps should be in the range [0, 1].'
+        )
+        self.decay_rate = decay_rate
+        self.eps = eps # prevent divide-by-zero
+        
+    def initialise(self, params):
+        super(RMSPropLearningRule, self).initialise(params)
+        self.mean_square = []
+        for param in self.params:
+            self.mean_square.append(np.ones_like(param))
+            
+    def reset(self):
+        for mean_square in zip(self.mean_square):
+            mean_square *= 0.
+
+    def update_params(self, grads_wrt_params):
+        for param, mean_square, grad in zip(self.params, self.mean_square, grads_wrt_params):
+            mean_square *= self.decay_rate
+            mean_square += (1. - self.decay_rate) * np.square(grad)
+            param -= self.learning_rate * grad / (np.sqrt(mean_square) + self.eps)
+
+class AdamLearningRule(GradientDescentLearningRule):
+    
+    def __init__(self, learning_rate=1e-3, decay_rate1=0.9, decay_rate2=0.999, eps=1e-8):
+        super(AdamLearningRule, self).__init__(learning_rate)
+        assert decay_rate1 >= 0. and decay_rate1 <= 1., (
+            'exp_decay_rate1 should be in the range [0, 1].'
+        )
+        assert decay_rate2 >= 0. and decay_rate2 <= 1., (
+            'exp_decay_rate2 should be in the range [0, 1].'
+        )
+        assert eps >= 0. and eps <= 1., (
+            'eps should be in the range [0, 1].'
+        )
+        self.decay_rate1 = decay_rate1
+        self.decay_rate2 = decay_rate2
+        self.eps = eps # avoid dividing by zero
+        
+    def initialise(self, params):
+        super(AdamLearningRule, self).initialise(params)
+        self.mom1 = []
+        self.mom2 = []
+        self.timestep = 0
+        for param in self.params:
+            self.mom1.append(np.zeros_like(param))
+            self.mom2.append(np.ones_like(param))
+            
+    def reset(self):
+        for mom1, mom2 in zip(self.mom1, self.mom2):
+            mom1 *= 0.
+            mom2 *= 0.
+        self.timestep = 0
+
+    def update_params(self, grads_wrt_params):
+        self.timestep += 1 
+        for param, mom1, mom2, grad in zip(self.params, self.mom1, self.mom2, grads_wrt_params):
+            mom1 = self.decay_rate1 * mom1 + (1. - self.decay_rate1) * grad
+            mom2 = self.decay_rate2 * mom2 + (1. - self.decay_rate2) * np.square(grad)
+            mom1_hat = mom1/(1 - self.decay_rate1 ** self.timestep)
+            mom2_hat = mom2/(1 - self.decay_rate2 ** self.timestep)
+            param -= self.learning_rate * mom1_hat / (np.sqrt(mom2_hat) + self.eps)
