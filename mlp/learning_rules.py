@@ -178,7 +178,7 @@ class RMSPropLearningRule(GradientDescentLearningRule):
         super(RMSPropLearningRule, self).initialise(params)
         self.mean_square = []
         for param in self.params:
-            self.mean_square.append(np.ones_like(param))
+            self.mean_square.append(np.zeros_like(param))
             
     def reset(self):
         for mean_square in zip(self.mean_square):
@@ -214,7 +214,7 @@ class AdamLearningRule(GradientDescentLearningRule):
         self.timestep = 0
         for param in self.params:
             self.mom1.append(np.zeros_like(param))
-            self.mom2.append(np.ones_like(param))
+            self.mom2.append(np.zeros_like(param))
             
     def reset(self):
         for mom1, mom2 in zip(self.mom1, self.mom2):

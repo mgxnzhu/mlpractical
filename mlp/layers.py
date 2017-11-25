@@ -518,7 +518,7 @@ class ConvolutionalLayer(LayerWithParameters):
         bias_shape = self.biases.shape[:] + (1,1)
         kernel_shape = kernels.shape[-2:]
         unroll_shape = inputs.shape[:2] + tuple(np.subtract(inputs.shape[-2:], kernel_shape) + 1) + kernel_shape
-        strides = inputs.strides[:-2] + inputs.strides[-2:] * 2
+        strides = inputs.strides[:2] + inputs.strides[-2:] * 2
 
         x_unroll = np.lib.stride_tricks.as_strided(inputs, unroll_shape, strides)
         output = np.einsum('bmijrs,lmrs->blij', x_unroll, kernels) + self.biases.reshape(bias_shape)
@@ -552,7 +552,7 @@ class ConvolutionalLayer(LayerWithParameters):
         kernel_shape = self.kernels.shape[-2:]
         unroll_shape = grads_pad.shape[:2] + \
             tuple(np.subtract(grads_pad.shape[-2:], kernel_shape) + 1) + kernel_shape
-        strides = grads_pad.strides[:-2] + grads_pad.strides[-2:] * 2
+        strides = grads_pad.strides[:2] + grads_pad.strides[-2:] * 2
         
         x_unroll = np.lib.stride_tricks.as_strided(grads_pad,unroll_shape,strides)
         output = np.einsum('bmijrs,mlrs->blij', x_unroll, self.kernels)
@@ -661,7 +661,7 @@ class MaxPoolingLayer(Layer):
         mask, = self.cache
         kernel_shape = (self.kernel_dim_1, self.kernel_dim_2)
         grads_wrt_outputs_unroll = grads_wrt_outputs.reshape(grads_wrt_outputs.shape+(1,1))*mask
-        roll_shape = grads_wrt_outputs_unroll.shape[:2] + tuple(np.multiply(grads_wrt_outputs_unroll.shape[-2:], kernel_shape))
+        roll_shape = grads_wrt_outputs.shape[:2] + tuple(np.multiply(grads_wrt_outputs.shape[-2:], kernel_shape))
         strides = grads_wrt_outputs_unroll.strides[:2] + grads_wrt_outputs_unroll.strides[-2:]
         grads_wrt_inputs = np.lib.stride_tricks.as_strided(grads_wrt_outputs_unroll,roll_shape,strides)
         return grads_wrt_inputs
