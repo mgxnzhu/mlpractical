@@ -49,9 +49,10 @@ def emnist_task():
     # Create data provider objects for the MNIST data set
     train_data = EMNISTDataProvider('train', batch_size=batch_size, rng=rng)
     valid_data = EMNISTDataProvider('valid', batch_size=batch_size, rng=rng)
+    test_data = EMNISTDataProvider('test', batch_size=batch_size, rng=rng)
 
-    learning_rate = 0.0001
-    num_epochs = 5
+    learning_rate = 0.001
+    num_epochs = 100
     stats_interval = 1
 
     conv_kernel_dim1, conv_kernel_dim2 = 5, 5
@@ -84,6 +85,5 @@ def emnist_task():
 
     #Remember to use notebook=False when you write a script to be run in a terminal
     _ = train_model_and_plot_stats(
-        model, error, learning_rule, train_data, valid_data, num_epochs, stats_interval, notebook=False)
-
+        model, error, learning_rule, train_data, test_data, num_epochs, stats_interval, notebook=False)
 emnist_task()
