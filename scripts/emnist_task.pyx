@@ -51,8 +51,8 @@ def emnist_task():
     valid_data = EMNISTDataProvider('valid', batch_size=batch_size, rng=rng)
     test_data = EMNISTDataProvider('test', batch_size=batch_size, rng=rng)
 
-    learning_rate = 0.001
-    num_epochs = 100
+    learning_rate = 3e-4
+    num_epochs = 50
     stats_interval = 1
 
     conv_kernel_dim1, conv_kernel_dim2 = 5, 5
@@ -72,16 +72,16 @@ def emnist_task():
         ReluLayer(),
         ConvolutionalLayer(conv1_channel, conv2_channel, conv2_dim2, conv2_dim2, conv_kernel_dim1, conv_kernel_dim2),
         MaxPoolingLayer(conv2_channel, pool2_dim1, pool2_dim2, pool_kernel_dim1, pool_kernel_dim2),
+	ReluLayer(),
         ReshapeLayer(),
         AffineLayer(fullcon_dim, hidden_dim, weights_init, biases_init),
         ReluLayer(),
-        AffineLayer(hidden_dim, output_dim, weights_init, biases_init),
-        SoftmaxLayer()
+	AffineLayer(hidden_dim, output_dim, weights_init, biases_init)
     ])
 
     error = CrossEntropySoftmaxError()
     # Use a basic gradient descent learning rule
-    learning_rule = AdamLearningRule(learning_rate=learning_rate)
+    learning_rule = RMSPropLearningRule(learning_rate=learning_rate)
 
     #Remember to use notebook=False when you write a script to be run in a terminal
     _ = train_model_and_plot_stats(
