@@ -1,0 +1,16 @@
+#!/bin/bash --login
+#PBS -N simple_CNN_1
+#PBS -l select=1
+#PBS -A d154
+#PBS -l place=excl
+#PBS -l walltime=20:00:00
+
+cd $PBS_O_WORKDIR
+
+module load mpt
+module load intel-compilers-17
+source activate mlp
+python emnist_task_cnn1.py
+source deactivate
+
+
