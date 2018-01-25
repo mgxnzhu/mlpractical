@@ -4,9 +4,9 @@
 #SBATCH -c 4	  # cores requested
 #SBATCH --gres=gpu:1
 #SBATCH --mem=16000  # memory in Mb
-#SBATCH -o outfile  # send stdout to outfile
-#SBATCH -e errfile  # send stderr to errfile
-#SBATCH -t 0:01:00  # time requested in hour:minute:secon
+#SBATCH -o sample_experiment_outfile  # send stdout to sample_experiment_outfile
+#SBATCH -e sample_experiment_errfile  # send stderr to sample_experiment_errfile
+#SBATCH -t 2:00:00  # time requested in hour:minute:secon
 export CUDA_HOME=/opt/cuda-8.0.44
 
 export CUDNN_HOME=/opt/cuDNN-6.0_8.0
