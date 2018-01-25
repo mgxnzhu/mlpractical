@@ -23,7 +23,7 @@ export PATH=${CUDA_HOME}/bin:${PATH}
 
 export PYTHON_PATH=$PATH
 
-mkdir -p /disk/scratch/sx
+mkdir -p /disk/scratch/${STUDENT_ID}
 
 export TMPDIR=/disk/scratch/${STUDENT_ID}/
 export TMP=/disk/scratch/${STUDENT_ID}/
